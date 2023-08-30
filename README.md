@@ -59,6 +59,8 @@ However, he trusts no one, and he hired another data scientist to get a second o
 Create a Jupyter notebook to explain what Francesco should look at and why.
 Your code should be understandable by a data scientist, but your text should be clear for a layman.
 
+[Exploratory data analysis](eda.ipynb)
+
 #### Challenge 2
 
 Then, Francesco tells you that the expert providing him with the stone valuations disappeared.
@@ -66,101 +68,99 @@ Then, Francesco tells you that the expert providing him with the stone valuation
 He insists on a point: his customer are not easy-going, so he wants to know why a stone is given a certain value.
 Create a Jupyter notebook to meet John's request.
 
+[Catboost regression model](model.ipynb)
+
+
 #### Challenge 3
 
 Francesco likes your model! Now he wants to use it. To improve the model, Francesco is open to hire a new expert and 
 let him value more stones.
 **Create an automatic pipeline capable of training a new instance of your model from the raw dataset**. 
 
+[Python script for model training](train.py)
+
 #### Challenge 4
 
 Finally, Francesco wants to embed your model in a web application, to allow for easy use by his employees.
 **Develop a REST API to expose the model predictions**.
 
----
-
-### Italian Power Load
-
-**Problem type**: time series forecasting
-
-**Dataset description**: [Power Load readme](./datasets/italian-power-load/README.md)
-
-It is your first day in the office and your first project is about time series forecasting.
-Your customer is Zap Inc, an imaginary Italian utility: they will provide you with the daily Italian Power Load from 2006 to 2022.
-Marta, a colleague of yours, provides you with a wise piece of advice: be careful about 2020, it was a very strange year...
-
-#### Challenge 1
-
-Zap Inc asks you for a complete report about the main feature of the power load series.
-**Create a Jupyter notebook to answer their query.**
-
-#### Challenge 2
-
-Then, your first forecasting model.
-**You are asked to develop a long-term model to predict the power load 1 year ahead.**
-Disregard 2020, 2021, and 2022: use 2019 as test.
-
-#### Challenge 3
-
-Long-term was great, but what about short term?
-**Your next task is to create a short-term model to predict the power load 1 day ahead.**
-Disregard 2020, 2021, and 2022: use 2019 as test.
-
-#### Challenge 4
-
-Finally, production trial.
-**Pick one of your models and develop and end-to-end pipeline to train and evaluate it on 2020 and 2021.**
-
-#### Challenge 5
-
-Zap Inc is not impressed by the performance of your model in 2020. You should defend your results.
-**Create a notebook to comment and explain the performance of your model in 2020.**
-
----
-
-### Employee Churn
-
-**Problem type**: classification
-
-**Dataset description**: [Employee churn readme](./datasets/employee-churn/README.md)
-
-You have just been contracted by Pear Inc, a multinational company worried about its poor talent retention.
-In the past few months, they collected data about their new employees. All of them come from classes 
-the company is sponsoring, yet many enter Pear just to leave a few months later.
-This is a huge waste of time and money.
-
-The HR department of the company wants you to understand what is going on and to prevent further bleeding. 
-
-#### Challenge 1
-
-Pear Inc wants you to understand what are the main traits separating the loyal employees from the others.
-**Create a Jupyter notebook to answer their query.**
-
-#### Challenge 2
-
-Then, a predicting model.
-**You are asked to create a model to predict whether a new employee would churn**.
-If possible, the company wants to know the likelihood of the churn.
-
-#### Challenge 3
-
-Wow, the model works great, but why does it? 
-**Try and make the model interpretable**, by highlighting the most important features and how each prediction is made.
-
-#### Challenge 4
-
-Now, production trial. 
-**Develop and end-to-end pipeline to train a model given a new dataset.**
-You can assume that the new dataset has exactly the same structure as the provided one: 
-possible structural changes will be managed by your fellow data engineers.
-
-#### Challenge 5
-
-Finally, Pear Inc is happy with your results!
-Now they want to embed your model in a web application. 
-**Develop a REST API to expose the model predictions**.
+[A simple FastAPI script](api.py)
 
 ---
 
 ## How to run
-Please fill this section as part of the assignment.
+
+### Prerequisites
+
+1. Make sure you have Python 3.11 installed.
+2. It's recommended to use a virtual environment for project dependencies.
+
+### Installation
+
+1. Clone this repository.
+   ```
+   git clone <REPO_URL>
+   cd <REPO_DIRECTORY>
+   ```
+
+2. Install the required packages.
+   ```
+   pip install -r requirements.txt
+   ```
+
+### Usage
+
+#### 1. Training the Model
+
+Use the `train.py` script to train the model on your dataset.
+
+```
+python train.py --data_path /path/to/diamonds.csv
+```
+
+Additional parameters such as model depth, learning rate, etc., can be set using the command-line arguments. Run `python train.py -h` to see all available options.
+
+
+#### 2. Running the API
+
+Start the FastAPI server with:
+
+```
+uvicorn api:app --reload
+```
+
+Once the API is running, you can:
+
+- Send a POST request to `http://127.0.0.1:8000/predict/` with diamond data in JSON format to get a price prediction.
+
+   Example with `curl`:
+   ```
+   curl -X POST http://127.0.0.1:8000/predict/ \
+   -H "Content-Type: application/json" \
+   -d '{
+       "carat": 0.3,
+       "cut": "Good",
+       "color": "E",
+       "clarity": "SI2",
+       "depth": 61.5,
+       "table": 55,
+       "x": 4.29,
+       "y": 4.31,
+       "z": 2.63
+   }'
+   ```
+
+- Send a POST request to `http://127.0.0.1:8000/predict_csv/` with a CSV file containing diamond data to get predictions for each row.
+
+   Example with `curl`:
+   ```
+   curl -X POST http://127.0.0.1:8000/predict_csv/ \
+   -H "Content-Type: multipart/form-data" \
+   -F "file=@/path/to/test_data.csv"
+   ```
+
+- Train a new model by sending a POST request to `http://127.0.0.1:8000/train/` with a CSV file containing diamond data.
+
+### Notes
+
+- Ensure that the diamond data provided has all the necessary columns (`carat`, `cut`, `color`, `clarity`, `depth`, `table`, `x`, `y`, `z`).
